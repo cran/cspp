@@ -1,10 +1,12 @@
-#'  Variables in the State Network (IPPSR) data
+#'  State Network (IPPSR) Dataset Variable Names
+#'
+#'  A dataset of the the names of the variables in the IPPSR state networks data.
+#'
+#'  @name network_vars
 #'
 #'  @docType data
 #'
 #'  @usage data(network_vars)
-#'
-#'  @format A data frame of n rows and n variables. Each observation is ...
 #'
 #'  @keywords datasets
 

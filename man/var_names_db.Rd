@@ -3,7 +3,7 @@
 \docType{data}
 \name{var_names_db}
 \alias{var_names_db}
-\title{var_names_db}
+\title{Correlates of State Policy Project Dataset (IPPSR) Variable Names}
 \format{
 An object of class \code{data.frame} with 2179 rows and 3 columns.
 }
@@ -11,12 +11,14 @@ An object of class \code{data.frame} with 2179 rows and 3 columns.
 var_names_db
 }
 \description{
-@docType data
+A dataframe of all variable names, their descriptions, and sources in the Correlates of State Policy Project Dataset.
 }
 \details{
-@usage data(var_names_db)
+@name var_names_db
 
- @format A data frame of n rows and n variables. Each observation is ...
+ @docType data
+
+ @usage data(var_names_db)
 
  @keywords datasets
 }

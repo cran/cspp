@@ -1,26 +1,48 @@
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
 
-# cspp: A Package for The Correlates of State Policy Project Data
+# cspp: A Tool for the Correlates of State Policy Project Data
 
 <!-- badges: start -->
 
 [![Build
 Status](https://travis-ci.com/correlatesstatepolicy/cspp.svg?branch=master)](https://travis-ci.org/correlatesstatepolicy/cspp)
+[![](https://www.r-pkg.org/badges/version/cspp?color=blue)](https://cran.r-project.org/package=cspp)
+[![](http://cranlogs.r-pkg.org/badges/grand-total/cspp?color=blue)](https://cran.r-project.org/package=cspp)
 <!-- badges: end -->
 
 **cspp** is a package designed to allow a user with only basic knowledge
 of R to find variables on state politics and policy, create and export
 datasets from these variables, subset the datasets by states and years,
 create map visualizations, and export citations to common file formats
-(e.g., `.bib`).
+(e.g.,
+`.bib`).
+
+## Updates:
+
+<!-- * **Version 0.3.1** -- Added the `plot_panel` function which facilitates the creation of timeseries plots, similar to [panelView](http://yiqingxu.org/software/panelView/panelView.html).  -->
+
+**Version 0.3.1**
+
+– Added the `plot_panel` function which facilitates the creation of
+timeseries plots, similar to
+[panelView](http://yiqingxu.org/software/panelView/panelView.html).
+
+– Added the `core` argument to the `get_cspp_data` function. Set it to
+`TRUE` to merge in common and important variables from the CSPP data.
+Useful for teaching purposes.
+
+– Added integration with csppData, a package we created to hold the
+Correlates of State Policy Project data and codebook. The CSPP data is
+not provided with this package now. It instead automatically loads the
+csppData package and its data.
 
 ## The Correlates of State Policy
 
 [The Correlates of State Policy
 Project](http://ippsr.msu.edu/public-policy/correlates-state-policy)
 compiles more than 2,000 variables across 50 states (+ DC) from
-1900-2016. The variables cover 16 broad categories:
+1900-2019. The variables cover 16 broad categories:
 
   - Demographics and Population
   - Economic and Fiscal Policy
@@ -42,8 +64,12 @@ compiles more than 2,000 variables across 50 states (+ DC) from
 ## Basic Use: Finding and Returning State Politics Data
 
 ``` r
+# For latest developmental verison:
 library(devtools)
 install_github("correlatesstatepolicy/cspp")
+
+# For CRAN version:
+install.packages("cspp")
 ```
 
 The primary functions in this package are `get_var_info` and
@@ -120,23 +146,21 @@ and `femal` within the variable name, returning 31 variables:
 
 ``` r
 # Search for variables by name
-get_var_info(var_names = c("pop","femal"))
-#> # A tibble: 31 x 12
-#>    variable years short_desc long_desc sources category plaintext_cite
-#>    <chr>    <chr> <chr>      <chr>     <chr>   <chr>    <chr>         
-#>  1 poptotal 1900… Populatio… Total po… "U.S. … demogra… <NA>          
-#>  2 popdens… 1975… Populatio… Number o… "http:… demogra… Ryu, Seung-Hy…
-#>  3 popfema… 1994… Female po… The numb… "CQ Pr… demogra… Morgan, K.O.L…
-#>  4 pctpopf… 2012… Female po… Percenta… "U.S. … demogra… Hamilton, Gre…
-#>  5 popmale  1994… Male popu… The numb… "CQ Pr… demogra… Morgan, K.O.L…
-#>  6 pctpopm… 2012… Male popu… Percenta… "U.S. … demogra… Hamilton, Gre…
-#>  7 popunde… 1994… Populatio… The numb… "CQ Pr… demogra… Morgan, K.O.L…
-#>  8 pctpopu… 2013… Populatio… Percenta… "U.S. … demogra… Hamilton, Gre…
-#>  9 pop5to17 1994… Populatio… The numb… "CQ Pr… demogra… Morgan, K.O.L…
-#> 10 pop18to… 1994… Populatio… The numb… "CQ Pr… demogra… Morgan, K.O.L…
-#> # … with 21 more rows, and 5 more variables: bibtex_cite <chr>,
-#> #   plaintext_cite2 <chr>, bibtex_cite2 <chr>, plaintext_cite3 <chr>,
-#> #   bibtex_cite3 <chr>
+get_var_info(var_names = c("pop","femal")) %>% dplyr::glimpse()
+#> Rows: 31
+#> Columns: 12
+#> $ variable        <chr> "poptotal", "popdensity", "popfemale", "pctpopfemale"…
+#> $ years           <chr> "1900-2008,2012-2017", "1975-1999", "1994-2010", "201…
+#> $ short_desc      <chr> "Population total", "Population density", "Female pop…
+#> $ long_desc       <chr> "Total population per state", "Number of people per s…
+#> $ sources         <chr> "U.S. Census Bureau (http://www.census.gov/)\r\nOrigi…
+#> $ category        <chr> "demographics", "demographics", "demographics", "demo…
+#> $ plaintext_cite  <chr> NA, "Ryu, Seung-Hyun. The effect of political ideolog…
+#> $ bibtex_cite     <chr> NA, "@phdthesis{ryu2009effect,\r\n  title={The effect…
+#> $ plaintext_cite2 <chr> NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, N…
+#> $ bibtex_cite2    <chr> NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, N…
+#> $ plaintext_cite3 <chr> NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, N…
+#> $ bibtex_cite3    <chr> NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, N…
 ```
 
 A similar line of code using the `related_to` parameter, instead of
@@ -145,23 +169,21 @@ returning 96 results:
 
 ``` r
 # Search by name and description:
-get_var_info(related_to = c("pop", "femal"))
-#> # A tibble: 96 x 12
-#>    variable years short_desc long_desc sources category plaintext_cite
-#>    <chr>    <chr> <chr>      <chr>     <chr>   <chr>    <chr>         
-#>  1 poptotal 1900… Populatio… Total po… "U.S. … demogra… <NA>          
-#>  2 popdens… 1975… Populatio… Number o… "http:… demogra… Ryu, Seung-Hy…
-#>  3 popfema… 1994… Female po… The numb… "CQ Pr… demogra… Morgan, K.O.L…
-#>  4 pctpopf… 2012… Female po… Percenta… "U.S. … demogra… Hamilton, Gre…
-#>  5 popmale  1994… Male popu… The numb… "CQ Pr… demogra… Morgan, K.O.L…
-#>  6 pctpopm… 2012… Male popu… Percenta… "U.S. … demogra… Hamilton, Gre…
-#>  7 popunde… 1994… Populatio… The numb… "CQ Pr… demogra… Morgan, K.O.L…
-#>  8 pctpopu… 2013… Populatio… Percenta… "U.S. … demogra… Hamilton, Gre…
-#>  9 pop5to17 1994… Populatio… The numb… "CQ Pr… demogra… Morgan, K.O.L…
-#> 10 pop18to… 1994… Populatio… The numb… "CQ Pr… demogra… Morgan, K.O.L…
-#> # … with 86 more rows, and 5 more variables: bibtex_cite <chr>,
-#> #   plaintext_cite2 <chr>, bibtex_cite2 <chr>, plaintext_cite3 <chr>,
-#> #   bibtex_cite3 <chr>
+get_var_info(related_to = c("pop", "femal")) %>% dplyr::glimpse()
+#> Rows: 96
+#> Columns: 12
+#> $ variable        <chr> "poptotal", "popdensity", "popfemale", "pctpopfemale"…
+#> $ years           <chr> "1900-2008,2012-2017", "1975-1999", "1994-2010", "201…
+#> $ short_desc      <chr> "Population total", "Population density", "Female pop…
+#> $ long_desc       <chr> "Total population per state", "Number of people per s…
+#> $ sources         <chr> "U.S. Census Bureau (http://www.census.gov/)\r\nOrigi…
+#> $ category        <chr> "demographics", "demographics", "demographics", "demo…
+#> $ plaintext_cite  <chr> NA, "Ryu, Seung-Hyun. The effect of political ideolog…
+#> $ bibtex_cite     <chr> NA, "@phdthesis{ryu2009effect,\r\n  title={The effect…
+#> $ plaintext_cite2 <chr> NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, N…
+#> $ bibtex_cite2    <chr> NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, N…
+#> $ plaintext_cite3 <chr> NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, N…
+#> $ bibtex_cite3    <chr> NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, N…
 ```
 
 You can also return whole categories of variables. The full list of
@@ -214,7 +236,7 @@ which are optional:
 
 In this example, the resulting dataframe includes the variables
 `c("sess_length", "hou_majority", "term_length")` as well as all
-variables in the category `demographics` for North Carolina, Virginia,
+variables in the category `demographics` for North Carolina, Virgina,
 and Georgia from 1994 to 2004.
 
 ``` r
@@ -253,78 +275,27 @@ of citations.
 
 ``` r
 # Simple dataframe for one variable
-get_cites(var_names = "poptotal")
-#>       variable
-#> 1     poptotal
-#> 2 cspp_dataset
-#> 3 cspp_package
-#>                                                                                                                                                        plaintext_cite
-#> 1                                                                                                                                                                <NA>
-#> 2 Jordan, Marty P. and Matt Grossmann. 2020. The Correlates of State Policy Project v.2.2. East Lansing, MI: Institute for Public Policy and Social Research (IPPSR).
-#> 3                                    Caleb Lucas and Joshua McCrain (2020). cspp: A Package for The Correlates of State Policy Project Data. R package version 0.1.0.
-#>                                                                                                                                                                                                                                                                                              bibtex_cite
-#> 1                                                                                                                                                                                                                                                                                                   <NA>
-#> 2 @misc{cspp_data, title = {The Correlates of State Policy Project v.2.2}, author = {Marty P. Jordan and Matt Grossmann}, year = {2020}, howpublished= {http://ippsr.msu.edu/public-policy/correlates-state-policy}, note = {East Lansing, MI: Institute for Public Policy and Social Research (IPPSR)}}
-#> 3                                         @Manual{cspp_package, title = {cspp: A Package for The Correlates of State Policy Project Data}, author = {Caleb Lucas and Josh McCrain}, year = {2020}, note = {R package version 0.1.0}, url = {http://ippsr.msu.edu/public-policy/correlates-state-policy}}
-#>   plaintext_cite2 bibtex_cite2 plaintext_cite3 bibtex_cite3               years
-#> 1            <NA>         <NA>            <NA>         <NA> 1900-2008,2012-2017
-#> 2            <NA>         <NA>            <NA>         <NA>                <NA>
-#> 3            <NA>         <NA>            <NA>         <NA>                <NA>
-#>         short_desc                  long_desc
-#> 1 Population total Total population per state
-#> 2             <NA>                       <NA>
-#> 3             <NA>                       <NA>
-#>                                                                                                                                                                                                                                                                                                                                         sources
-#> 1 U.S. Census Bureau (http://www.census.gov/)\r\nOriginally provided by Stateminder: A data visualization project from Georgetown University. http://stateminder.org/ (no longer accessible online)\r\nFor 2012–2017: U.S. Census Bureau, American Fact Finder: https://www.census.gov/acs/www/data/data-tables-and-tools/american- factfinder/
-#> 2                                                                                                                                                                                                                                                                                                                                          <NA>
-#> 3                                                                                                                                                                                                                                                                                                                                          <NA>
-#>       category
-#> 1 demographics
-#> 2         <NA>
-#> 3         <NA>
+get_cites(var_names = "poptotal") %>% dplyr::glimpse()
+#> Rows: 3
+#> Columns: 12
+#> $ variable        <chr> "poptotal", "cspp_dataset", "cspp_package"
+#> $ plaintext_cite  <chr> NA, "Jordan, Marty P. and Matt Grossmann. 2020. The C…
+#> $ bibtex_cite     <chr> NA, "@misc{cspp_data, title = {The Correlates of Stat…
+#> $ plaintext_cite2 <chr> NA, NA, NA
+#> $ bibtex_cite2    <chr> NA, NA, NA
+#> $ plaintext_cite3 <chr> NA, NA, NA
+#> $ bibtex_cite3    <chr> NA, NA, NA
+#> $ years           <chr> "1900-2008,2012-2017", NA, NA
+#> $ short_desc      <chr> "Population total", NA, NA
+#> $ long_desc       <chr> "Total population per state", NA, NA
+#> $ sources         <chr> "U.S. Census Bureau (http://www.census.gov/)\r\nOrigi…
+#> $ category        <chr> "demographics", NA, NA
 
 # Using get_var_info to return variable citations
-get_cites(var_names = get_var_info(related_to = "concealed carry")$variable)
-#>       variable
-#> 1       bjourn
-#> 2       bprecc
-#> 3 cspp_dataset
-#> 4 cspp_package
-#>                                                                                                                                                        plaintext_cite
-#> 1                                                                                                                                                                <NA>
-#> 2                                                                                                                                                                <NA>
-#> 3 Jordan, Marty P. and Matt Grossmann. 2020. The Correlates of State Policy Project v.2.2. East Lansing, MI: Institute for Public Policy and Social Research (IPPSR).
-#> 4                                    Caleb Lucas and Joshua McCrain (2020). cspp: A Package for The Correlates of State Policy Project Data. R package version 0.1.0.
-#>                                                                                                                                                                                                                                                                                              bibtex_cite
-#> 1                                                                                                                                                                                                                                                                                                   <NA>
-#> 2                                                                                                                                                                                                                                                                                                   <NA>
-#> 3 @misc{cspp_data, title = {The Correlates of State Policy Project v.2.2}, author = {Marty P. Jordan and Matt Grossmann}, year = {2020}, howpublished= {http://ippsr.msu.edu/public-policy/correlates-state-policy}, note = {East Lansing, MI: Institute for Public Policy and Social Research (IPPSR)}}
-#> 4                                         @Manual{cspp_package, title = {cspp: A Package for The Correlates of State Policy Project Data}, author = {Caleb Lucas and Josh McCrain}, year = {2020}, note = {R package version 0.1.0}, url = {http://ippsr.msu.edu/public-policy/correlates-state-policy}}
-#>   plaintext_cite2 bibtex_cite2 plaintext_cite3 bibtex_cite3     years
-#> 1            <NA>         <NA>            <NA>         <NA> 1986-2016
-#> 2            <NA>         <NA>            <NA>         <NA> 1986-2016
-#> 3            <NA>         <NA>            <NA>         <NA>      <NA>
-#> 4            <NA>         <NA>            <NA>         <NA>      <NA>
-#>                                             short_desc
-#> 1                              Carry in motor vehicles
-#> 2 State preemption of local concealed carry ordinances
-#> 3                                                 <NA>
-#> 4                                                 <NA>
-#>                                                                                                                                                                                                                                                                                                                                  long_desc
-#> 1 Carry in motor vehicles (peaceable journey) (0 = not permitted unless locked in container, 0.5 = permitted with CC permit/license but only if in plain view, 1 = only with concealed carry permit (unless in locked container or glove box), 2 = either 'plain view' or 'concealed' restrictions, 3 = no restrictions even if concealed)
-#> 2                                                                                                                                                                                                     State preemption of local concealed carry ordinances? (0 = no, 0.5 = limited/special legislation for particular localities, 1 = yes)
-#> 3                                                                                                                                                                                                                                                                                                                                     <NA>
-#> 4                                                                                                                                                                                                                                                                                                                                     <NA>
-#>                                                                                                                                                               sources
-#> 1 Sorens, Jason, Fait Muedini, and William P. Ruger. 'State and Local Public Policies in 2006: A New Database.' State Politics & Policy Quarterly 8.3 (2008): 309–26.
-#> 2 Sorens, Jason, Fait Muedini, and William P. Ruger. 'State and Local Public Policies in 2006: A New Database.' State Politics & Policy Quarterly 8.3 (2008): 309–26.
-#> 3                                                                                                                                                                <NA>
-#> 4                                                                                                                                                                <NA>
-#>      category
-#> 1 gun control
-#> 2 gun control
-#> 3        <NA>
-#> 4        <NA>
+cite_ex <- get_cites(var_names = get_var_info(related_to = "concealed carry")$variable)
+cite_ex$plaintext_cite[3:4]
+#> [1] "Jordan, Marty P. and Matt Grossmann. 2020. The Correlates of State Policy Project v.2.2. East Lansing, MI: Institute for Public Policy and Social Research (IPPSR)."
+#> [2] "Caleb Lucas and Joshua McCrain (2020). cspp: A Package for The Correlates of State Policy Project Data. R package version 0.1.0."
 ```
 
 There is also an option to output the citations to a .bib, .csv or .txt
@@ -370,10 +341,10 @@ library(ggplot2) # optional, but needed to remove legend
 # Generates a map of the percentage of the population over 65
 generate_map(get_cspp_data(var_category = "demographics"),
              var_name = "pctpopover65") +
-  theme(legend.position = "none")
+  ggplot2::theme(legend.position = "none")
 ```
 
-<img src="man/figures/README-unnamed-chunk-14-1.png" width="60%" />
+<img src="man/figures/README-unnamed-chunk-16-1.png" width="60%" />
 
 In this example, since the dataframe passed is generated by
 `get_cspp_data(var_category = "demographics")` and contains all years
@@ -386,16 +357,15 @@ containing only certain states, it only plots those states:
 ``` r
 library(dplyr)
 
-
 generate_map(get_cspp_data(var_category = "demographics") %>%
                 dplyr::filter(st.abb %in% c("NC", "VA", "SC")),
               var_name = "pctpopover65",
               poly_args = list(color = "black"),
               drop_NA_states = TRUE) +
-  theme(legend.position = "none")
+  ggplot2::theme(legend.position = "none")
 ```
 
-<img src="man/figures/README-unnamed-chunk-15-1.png" width="60%" />
+<img src="man/figures/README-unnamed-chunk-17-1.png" width="60%" />
 
 Since this function returns a `ggplot` object, you can customize it
 endlessly:
@@ -406,12 +376,61 @@ generate_map(get_cspp_data(var_category = "demographics") %>%
               var_name = "pctpopover65",
               poly_args = list(color = "black"),
               drop_NA_states = TRUE) +
-  scale_fill_gradient(low = "white", high = "red") +
-  theme(legend.position = "none") +
-  ggtitle("% Population Over 65")
+  ggplot2::scale_fill_gradient(low = "white", high = "red") +
+  ggplot2::theme(legend.position = "none") +
+  ggplot2::ggtitle("% Population Over 65")
 ```
 
-<img src="man/figures/README-unnamed-chunk-16-1.png" width="60%" />
+<img src="man/figures/README-unnamed-chunk-18-1.png" width="60%" />
+
+## Plot timeseries data
+
+To facilitate the visualization of the timeseries and panel nature of
+the CSPP data, the `plot_panel` function takes a dataframe from
+`get_cspp_data` and plots a state-year panel in one of two formats. The
+parameters of this function are as follows:
+
+  - `cspp_data` - a dataframe generated by `get_cspp_data` or,
+    alternatively, a dataframe with the columns `st.abb`, `year`, plus
+    one other variable.
+  - `var_name` - the name of the variable to be plotted.
+  - `years` - the years to include in the panel.
+  - `colors` - three color values that are used in the plot. The first
+    color takes the lowest values of the variable, the second the
+    highest, and the third is the color used for NA values.
+  - `plot_type` - one of “grid” or “line”. Defaults to “grid”. Both are
+    displayed next.
+
+The function returns a `ggplot2` object, making it easier to change and
+add layers onto the generated plot.
+
+A common research design is to use variation in policy adoption as a
+‘treatment’ in a pseudo-experimental setting. This function makes it
+easy to visualize when states are subject to this treatment.
+
+``` r
+# panel of all states' adoption of medical marijuana laws
+cspp <- get_cspp_data(vars = "drugs_medical_marijuana")
+
+# visualize panel:
+plot_panel(cspp)
+#> Values from drugs_medical_marijuana used to fill cells.
+```
+
+<img src="man/figures/README-unnamed-chunk-19-1.png" width="100%" />
+
+The function also works with continuous variables, such as the state
+policy liberalism score:
+
+``` r
+plot_panel(cspp_data = get_cspp_data(vars = "pollib_median"),
+           colors = c("firebrick4", "steelblue2", "gray"),
+           years = seq(1960, 2010)) +
+  ggplot2::ggtitle("Policy liberalism")
+#> Values from pollib_median used to fill cells.
+```
+
+<img src="man/figures/README-unnamed-chunk-20-1.png" width="100%" />
 
 ## Network data
 
@@ -422,45 +441,129 @@ edge list).
 
 ``` r
 # Returns dataframe of state dyads
-head(get_network_data())
-#> # A tibble: 6 x 120
-#>   State1 State2 st.abb2 st.abb1 dyadid S1region S2region S1division S2division
-#>   <chr>  <chr>  <chr>   <chr>   <chr>  <chr>    <chr>    <chr>      <chr>     
-#> 1 Alaba… Alaska AK      AL      AL-AK  South    West     East Sout… Pacific   
-#> 2 Alaba… Arizo… AZ      AL      AL-AZ  South    West     East Sout… Mountain  
-#> 3 Alaba… Arkan… AR      AL      AL-AR  South    South    East Sout… West Sout…
-#> 4 Alaba… Calif… CA      AL      AL-CA  South    West     East Sout… Pacific   
-#> 5 Alaba… Color… CO      AL      AL-CO  South    West     East Sout… Mountain  
-#> 6 Alaba… Conne… CT      AL      AL-CT  South    Northea… East Sout… New Engla…
-#> # … with 111 more variables: Border <dbl>, Distance <dbl>, State1_Lat <dbl>,
-#> #   State1_Long <dbl>, State2_Lat <dbl>, State2_Long <dbl>,
-#> #   ACS_Migration <dbl>, PopDif <dbl>, State1_Pop <dbl>, State2_Pop <dbl>,
-#> #   IncomingFlights <dbl>, IRS_migration <dbl>, Income <dbl>,
-#> #   IRS_migration_2010 <dbl>, Income_2010 <dbl>, Imports <dbl>, GSPDif <dbl>,
-#> #   S1GSP <dbl>, S2GSP <dbl>, DemDif <dbl>, S1AvgDem <dbl>, S2AvgDem <dbl>,
-#> #   S1SenDemProp <dbl>, S1HSDemProp <dbl>, S2SenDemProp <dbl>,
-#> #   S2HSDemProp <dbl>, IdeologyDif <dbl>, PIDDif <dbl>, S1Ideology <dbl>,
-#> #   S1PID <dbl>, S2Ideology <dbl>, S2PID <dbl>, policy_diffusion_tie <dbl>,
-#> #   policy_diffusion_2015 <dbl>, policy_diffusion_2000.2015 <dbl>,
-#> #   LibDif <dbl>, ELibDif <dbl>, SLibDif <dbl>, S1EconomicLiberalism <dbl>,
-#> #   S1SocialLiberalism <dbl>, S2EconomicLiberalism <dbl>,
-#> #   S2SocialLiberalism <dbl>, MassSocLibDif <dbl>, MassEconLibDif <dbl>,
-#> #   PolSocLibDif <dbl>, PolEconLibDif <dbl>, State1PolSocLib <dbl>,
-#> #   State1PolEconLib <dbl>, State1MassSocLib <dbl>, State1MassEconLib <dbl>,
-#> #   State2PolSocLib <dbl>, State2PolEconLib <dbl>, State2MassSocLib <dbl>,
-#> #   State2MassEconLib <dbl>, perceived_similarity <dbl>, RaceDif <dbl>,
-#> #   LatinoDif <dbl>, WhiteDif <dbl>, BlackDif <dbl>, AsianDif <dbl>,
-#> #   NativeDif <dbl>, S1Latino <dbl>, S1White <dbl>, S1Black <dbl>,
-#> #   S1Asian <dbl>, S1Native <dbl>, S2Latino <dbl>, S2White <dbl>,
-#> #   S2Black <dbl>, S2Asian <dbl>, S2Native <dbl>, ReligDif <dbl>,
-#> #   ChristianDif <dbl>, EvangelicalDif <dbl>, MainlineDif <dbl>, BPDif <dbl>,
-#> #   CatholicDif <dbl>, MormonDif <dbl>, JewishDif <dbl>, MuslimDif <dbl>,
-#> #   BuddhistDif <dbl>, HinduDif <dbl>, NonesDif <dbl>, NPDif <dbl>,
-#> #   ReligiosityDif <dbl>, S1Christian <dbl>, S1Evangelical <dbl>,
-#> #   S1Mainline <dbl>, S1BlackProt <dbl>, S1Catholic <dbl>, S1Mormon <dbl>,
-#> #   S1Jewish <dbl>, S1Muslim <dbl>, S1Buddhist <dbl>, S1Hindu <dbl>,
-#> #   S1Nones <dbl>, S1NothingParticular <dbl>, S1HighlyReligious <dbl>,
-#> #   S2Christian <dbl>, S2Evangelical <dbl>, …
+get_network_data() %>% dplyr::glimpse()
+#> Rows: 2,550
+#> Columns: 120
+#> $ State1                     <chr> "Alabama", "Alabama", "Alabama", "Alabama"…
+#> $ State2                     <chr> "Alaska", "Arizona", "Arkansas", "Californ…
+#> $ st.abb2                    <chr> "AK", "AZ", "AR", "CA", "CO", "CT", "DE", …
+#> $ st.abb1                    <chr> "AL", "AL", "AL", "AL", "AL", "AL", "AL", …
+#> $ dyadid                     <chr> "AL-AK", "AL-AZ", "AL-AR", "AL-CA", "AL-CO…
+#> $ S1region                   <chr> "South", "South", "South", "South", "South…
+#> $ S2region                   <chr> "West", "West", "South", "West", "West", "…
+#> $ S1division                 <chr> "East South Central", "East South Central"…
+#> $ S2division                 <chr> "Pacific", "Mountain", "West South Central…
+#> $ Border                     <dbl> 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, …
+#> $ Distance                   <dbl> 4594.3668, 2407.6648, 620.4273, 3243.6837,…
+#> $ State1_Lat                 <dbl> 32.36154, 32.36154, 32.36154, 32.36154, 32…
+#> $ State1_Long                <dbl> -86.27912, -86.27912, -86.27912, -86.27912…
+#> $ State2_Lat                 <dbl> 58.30194, 33.44846, 34.73601, 38.55560, 39…
+#> $ State2_Long                <dbl> -134.41974, -112.07384, -92.33112, -121.46…
+#> $ ACS_Migration              <dbl> 528, 1005, 926, 3107, 1251, 327, 113, 99, …
+#> $ PopDif                     <dbl> 4088469, -2116015, 1850948, -34266641, -72…
+#> $ State1_Pop                 <dbl> 4819343, 4819343, 4819343, 4819343, 481934…
+#> $ State2_Pop                 <dbl> 730874, 6935358, 2968395, 39085984, 554228…
+#> $ IncomingFlights            <dbl> 75, 0, 0, 72, 51, 328, 0, 0, 0, 606, 0, 77…
+#> $ IRS_migration              <dbl> 7698, 15051, 17858, 61401, 19956, 6408, 25…
+#> $ Income                     <dbl> 147372, 339243, 371553, 1364538, 445755, 1…
+#> $ IRS_migration_2010         <dbl> 528, 1005, 926, 3107, 1251, 327, 113, 99, …
+#> $ Income_2010                <dbl> 9214, 23289, 18692, 66991, 25235, 9019, 23…
+#> $ Imports                    <dbl> 2.997198e+05, 2.065025e+09, 2.033900e+09, …
+#> $ GSPDif                     <dbl> 155221, -100224, 84242, -2417106, -117019,…
+#> $ S1GSP                      <dbl> 205625, 205625, 205625, 205625, 205625, 20…
+#> $ S2GSP                      <dbl> 50404, 305849, 121383, 2622731, 322644, 25…
+#> $ DemDif                     <dbl> -0.07857143, -0.14523810, -0.06571428, -0.…
+#> $ S1AvgDem                   <dbl> 0.2714286, 0.2714286, 0.2714286, 0.2714286…
+#> $ S2AvgDem                   <dbl> 0.3500000, 0.4166667, 0.3371429, 0.6375000…
+#> $ S1SenDemProp               <dbl> 0.2285714, 0.2285714, 0.2285714, 0.2285714…
+#> $ S1HSDemProp                <dbl> 0.3142857, 0.3142857, 0.3142857, 0.3142857…
+#> $ S2SenDemProp               <dbl> 0.3000000, 0.4333333, 0.3142857, 0.6250000…
+#> $ S2HSDemProp                <dbl> 0.4000000, 0.4000000, 0.3600000, 0.6500000…
+#> $ IdeologyDif                <dbl> 0.31610168, 0.06866579, -0.11840535, -0.21…
+#> $ PIDDif                     <dbl> 0.14324945, -0.10957587, -0.15900619, -0.2…
+#> $ S1Ideology                 <dbl> -0.03389831, -0.03389831, -0.03389831, -0.…
+#> $ S1PID                      <dbl> -0.3304348, -0.3304348, -0.3304348, -0.330…
+#> $ S2Ideology                 <dbl> -0.34999999, -0.10256410, 0.08450704, 0.17…
+#> $ S2PID                      <dbl> -0.47368422, -0.22085890, -0.17142858, -0.…
+#> $ policy_diffusion_tie       <dbl> 0, 20, 7, 5, 1, 5, 56, NA, 15, 40, 0, 19, …
+#> $ policy_diffusion_2015      <dbl> 0, 1, 0, 1, 0, 0, 1, NA, 1, 1, 0, 1, 1, 0,…
+#> $ policy_diffusion_2000.2015 <dbl> 0, 7, 0, 5, 0, 3, 16, NA, 13, 16, 0, 16, 1…
+#> $ LibDif                     <dbl> NA, 34.186113, 2.949804, 46.088120, 44.423…
+#> $ ELibDif                    <dbl> NA, 1.230781, -2.156186, -3.115099, 8.0097…
+#> $ SLibDif                    <dbl> NA, -32.955332, -0.793618, -42.973021, -36…
+#> $ S1EconomicLiberalism       <dbl> -0.0384034, -0.0384034, -0.0384034, -0.038…
+#> $ S1SocialLiberalism         <dbl> -0.2714913, -0.2714913, -0.2714913, -0.271…
+#> $ S2EconomicLiberalism       <dbl> NA, -0.05071121, -0.01684154, -0.00725241,…
+#> $ S2SocialLiberalism         <dbl> NA, 0.05806200, -0.26355514, 0.15823889, 0…
+#> $ MassSocLibDif              <dbl> -0.38336566, 0.08869284, -1.38085590, -2.2…
+#> $ MassEconLibDif             <dbl> -0.06364249, -0.14963306, -0.07359393, -0.…
+#> $ PolSocLibDif               <dbl> -1.4865111, 0.2728079, -0.9492451, -4.2095…
+#> $ PolEconLibDif              <dbl> -1.1890527, -0.2309994, -0.1488198, -2.929…
+#> $ State1PolSocLib            <dbl> -1.577025, -1.577025, -1.577025, -1.577025…
+#> $ State1PolEconLib           <dbl> -1.370212, -1.370212, -1.370212, -1.370212…
+#> $ State1MassSocLib           <dbl> 0.07021931, 0.07021931, 0.07021931, 0.0702…
+#> $ State1MassEconLib          <dbl> -0.5247536, -0.5247536, -0.5247536, -0.524…
+#> $ State2PolSocLib            <dbl> -0.090514018, -1.849832972, -0.627779955, …
+#> $ State2PolEconLib           <dbl> -0.18115938, -1.13921271, -1.22139223, 1.5…
+#> $ State2MassSocLib           <dbl> 0.45358497, -0.01847353, 1.45107521, 2.292…
+#> $ State2MassEconLib          <dbl> -0.4611111, -0.3751206, -0.4511597, 0.0189…
+#> $ perceived_similarity       <dbl> 0.116279073, 0.067307696, 0.343750000, 0.0…
+#> $ RaceDif                    <dbl> 50.6, 66.0, 22.0, 97.9, 44.8, 33.5, 16.7, …
+#> $ LatinoDif                  <dbl> -2.9, -27.3, -3.3, -35.0, -17.4, -12.0, -5…
+#> $ WhiteDif                   <dbl> 4.9, 10.8, -6.8, 28.5, -2.7, -1.2, 3.3, 29…
+#> $ BlackDif                   <dbl> 23.8, 22.6, 11.5, 21.2, 22.8, 16.8, 5.2, -…
+#> $ AsianDif                   <dbl> -5.3, -1.9, -0.3, -13.1, -1.8, -3.2, -2.7,…
+#> $ NativeDif                  <dbl> -13.7, -3.4, -0.1, 0.1, -0.1, 0.3, 0.3, 0.…
+#> $ S1Latino                   <dbl> 0.041, 0.041, 0.041, 0.041, 0.041, 0.041, …
+#> $ S1White                    <dbl> 0.655, 0.655, 0.655, 0.655, 0.655, 0.655, …
+#> $ S1Black                    <dbl> 0.267, 0.267, 0.267, 0.267, 0.267, 0.267, …
+#> $ S1Asian                    <dbl> 0.013, 0.013, 0.013, 0.013, 0.013, 0.013, …
+#> $ S1Native                   <dbl> 0.005, 0.005, 0.005, 0.005, 0.005, 0.005, …
+#> $ S2Latino                   <dbl> 0.070, 0.314, 0.074, 0.391, 0.215, 0.161, …
+#> $ S2White                    <dbl> 0.606, 0.547, 0.723, 0.370, 0.682, 0.667, …
+#> $ S2Black                    <dbl> 0.029, 0.041, 0.152, 0.055, 0.039, 0.099, …
+#> $ S2Asian                    <dbl> 0.066, 0.032, 0.016, 0.144, 0.031, 0.045, …
+#> $ S2Native                   <dbl> 0.142, 0.039, 0.006, 0.004, 0.006, 0.002, …
+#> $ ReligDif                   <dbl> 74, 77, 23, 89, 58, 94, 81, 74, 63, 22, 77…
+#> $ ChristianDif               <dbl> 24, 19, 7, 23, 22, 16, 17, 21, 16, 7, 23, …
+#> $ EvangelicalDif             <dbl> 27, 23, 3, 29, 23, 36, 34, 35, 25, 11, 24,…
+#> $ MainlineDif                <dbl> 1, 1, -3, 3, -2, -4, -8, -2, -1, 1, 2, -3,…
+#> $ BPDif                      <dbl> 13, 15, 8, 14, 14, 11, 6, 4, 8, -1, 14, 16…
+#> $ CatholicDif                <dbl> -9, -14, -1, -21, -9, -26, -15, -12, -14, …
+#> $ MormonDif                  <dbl> -4, -4, 0, 0, -1, 0, 1, 0, 0, 0, -2, -18, …
+#> $ JewishDif                  <dbl> 0, -2, 0, -2, -1, -3, -3, -4, -3, -1, 0, 0…
+#> $ MuslimDif                  <dbl> 0, -1, -2, -1, 0, -1, -1, -2, 0, 0, 0, -1,…
+#> $ BuddhistDif                <dbl> -1, -1, 0, -2, -1, -1, 0, -2, 0, 0, -8, 0,…
+#> $ HinduDif                   <dbl> 0, -1, 0, -2, 0, -1, -2, -1, 0, 0, 0, 0, -…
+#> $ NonesDif                   <dbl> -19, -15, -6, -15, -7, -11, -11, -12, -12,…
+#> $ NPDif                      <dbl> -11, -10, -4, -9, -11, -5, -9, -7, -8, -4,…
+#> $ ReligiosityDif             <dbl> 32, 24, 7, 28, 30, 34, 25, 24, 23, 11, 30,…
+#> $ S1Christian                <dbl> 0.86, 0.86, 0.86, 0.86, 0.86, 0.86, 0.86, …
+#> $ S1Evangelical              <dbl> 0.49, 0.49, 0.49, 0.49, 0.49, 0.49, 0.49, …
+#> $ S1Mainline                 <dbl> 0.13, 0.13, 0.13, 0.13, 0.13, 0.13, 0.13, …
+#> $ S1BlackProt                <dbl> 0.16, 0.16, 0.16, 0.16, 0.16, 0.16, 0.16, …
+#> $ S1Catholic                 <dbl> 0.07, 0.07, 0.07, 0.07, 0.07, 0.07, 0.07, …
+#> $ S1Mormon                   <dbl> 0.01, 0.01, 0.01, 0.01, 0.01, 0.01, 0.01, …
+#> $ S1Jewish                   <dbl> 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, …
+#> $ S1Muslim                   <dbl> 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, …
+#> $ S1Buddhist                 <dbl> 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, …
+#> $ S1Hindu                    <dbl> 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, …
+#> $ S1Nones                    <dbl> 0.12, 0.12, 0.12, 0.12, 0.12, 0.12, 0.12, …
+#> $ S1NothingParticular        <dbl> 0.09, 0.09, 0.09, 0.09, 0.09, 0.09, 0.09, …
+#> $ S1HighlyReligious          <dbl> 0.77, 0.77, 0.77, 0.77, 0.77, 0.77, 0.77, …
+#> $ S2Christian                <dbl> 0.62, 0.67, 0.79, 0.63, 0.64, 0.70, 0.69, …
+#> $ S2Evangelical              <dbl> 0.22, 0.26, 0.46, 0.20, 0.26, 0.13, 0.15, …
+#> $ S2Mainline                 <dbl> 0.12, 0.12, 0.16, 0.10, 0.15, 0.17, 0.21, …
+#> $ S2BlackProt                <dbl> 0.03, 0.01, 0.08, 0.02, 0.02, 0.05, 0.10, …
+#> $ S2Catholic                 <dbl> 0.16, 0.21, 0.08, 0.28, 0.16, 0.33, 0.22, …
+#> $ S2Mormon                   <dbl> 0.05, 0.05, 0.01, 0.01, 0.02, 0.01, 0.00, …
+#> $ S2Jewish                   <dbl> 0.00, 0.02, 0.00, 0.02, 0.01, 0.03, 0.03, …
+#> $ S2Muslim                   <dbl> 0.00, 0.01, 0.02, 0.01, 0.00, 0.01, 0.01, …
+#> $ S2Buddhist                 <dbl> 0.01, 0.01, 0.00, 0.02, 0.01, 0.01, 0.00, …
+#> $ S2Hindu                    <dbl> 0.00, 0.01, 0.00, 0.02, 0.00, 0.01, 0.02, …
+#> $ S2Nones                    <dbl> 0.31, 0.27, 0.18, 0.27, 0.19, 0.23, 0.23, …
+#> $ S2NothingParticular        <dbl> 0.20, 0.19, 0.13, 0.18, 0.20, 0.14, 0.18, …
+#> $ S2HighlyReligious          <dbl> 0.45, 0.53, 0.70, 0.49, 0.47, 0.43, 0.52, …
 ```
 
 The function has two optional parameters `category` and `merge_data`. If
@@ -511,7 +614,9 @@ names(network.df)
 
 library(dplyr)
 
-head(cspp_data %>% arrange(st.abb))
+cspp_data %>% 
+  arrange(st.abb) %>%
+  head()
 #>   year st.abb stateno    state state_fips state_icpsr sess_length hou_majority
 #> 1 1999     AK       2   Alaska          2          81      167.56        0.752
 #> 2 2000     AK       2   Alaska          2          81          NA        0.752
@@ -522,14 +627,52 @@ head(cspp_data %>% arrange(st.abb))
 # the merged value of Alaska's hou_majority value will be mean(c(-0.129, -0.115))
 ```
 
+### Network Plotting Examples
+
+Here are two examples of plotting the state network edgelist data using
+`igraph` and `ggraph`:
+
+``` r
+library(ggraph)
+library(igraph)
+
+network.df <- select(network.df, from = st.abb1, to = st.abb2, ACS_Migration) 
+
+network.df %>% 
+  filter(from %in% c("NC", "VA", "SC", "GA")) %>% 
+  graph_from_data_frame() %>% 
+  ggraph(layout="fr") + 
+  geom_edge_link(aes(edge_alpha = ACS_Migration), edge_color = "royalblue") + 
+  geom_node_point() +
+  geom_node_text(aes(label = name), repel = TRUE, point.padding = unit(0.2, "lines")) +
+  theme_void() +
+  theme(legend.position = "none")
+```
+
+<img src="man/figures/README-unnamed-chunk-24-1.png" width="100%" />
+
+``` r
+network.df %>% 
+  filter(from %in% c("NC")) %>% 
+  graph_from_data_frame() %>% 
+  ggraph(layout="linear") + 
+  geom_edge_arc(aes(edge_alpha = ACS_Migration), edge_color = "royalblue") + 
+  geom_node_text(aes(label = name), size = 2) +
+  theme_void() +
+  theme(legend.position = "none")
+```
+
+<img src="man/figures/README-unnamed-chunk-25-1.png" width="100%" />
+
 # Citation
 
 > Caleb Lucas and Joshua McCrain (2020). cspp: A Package for The
-> Correlates of State Policy Project Data. R package version 0.1.0.
+> Correlates of State Policy Project Data. R package version 0.3.1.
 
 # Contact
 
 [**Caleb Lucas**](https://caleblucas.com/) - Ph.D. Candidate, Michigan
-State University ([Twitter](https://twitter.com/caleblucas)) <br />
-[**Josh McCrain**](http://joshuamccrain.com) - Post-doc, IPPSR, Michigan
-State University ([Twitter](https://twitter.com/joshmccrain))
+State University ([Twitter](https://twitter.com/calebjlucas?lang=en))
+<br /> [**Josh McCrain**](http://joshuamccrain.com) - Post-doc, IPPSR,
+Michigan State University
+([Twitter](https://twitter.com/joshmccrain?lang=en))
