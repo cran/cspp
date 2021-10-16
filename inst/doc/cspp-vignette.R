@@ -84,7 +84,7 @@ generate_map(get_cspp_data(var_category = "demographics"),
 library(dplyr)
 
 generate_map(get_cspp_data(var_category = "demographics") %>%
-                dplyr::filter(st.abb %in% c("NC", "VA", "SC")),
+                dplyr::filter(st %in% c("NC", "VA", "SC")),
               var_name = "pctpopover65",
               poly_args = list(color = "black"),
               drop_NA_states = TRUE) +
@@ -92,7 +92,7 @@ generate_map(get_cspp_data(var_category = "demographics") %>%
 
 ## ----out.width='60%'----------------------------------------------------------
 generate_map(get_cspp_data(var_category = "demographics") %>%
-                dplyr::filter(st.abb %in% c("NC", "VA", "SC", "TN", "GA", "WV", "MS", "AL", "KY")),
+                dplyr::filter(st %in% c("NC", "VA", "SC", "TN", "GA", "WV", "MS", "AL", "KY")),
               var_name = "pctpopover65",
               poly_args = list(color = "black"),
               drop_NA_states = TRUE) +
@@ -132,7 +132,7 @@ names(network.df)
 
 library(dplyr)
 
-head(cspp_data %>% arrange(st.abb))
+head(cspp_data %>% arrange(st))
 # the merged value of Alaska's hou_majority value will be mean(c(-0.129, -0.115))
 
 
